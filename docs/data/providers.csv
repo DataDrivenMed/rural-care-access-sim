@@ -1,0 +1,15 @@
+id,name,specialty,state,county,lat,lon,setting,rural_flag
+P1,Evangeline Family Medicine,Family Medicine,LA,Evangeline,30.675,-92.306,Rural clinic,1
+P2,Concordia Rural Health Clinic,Family Medicine,LA,Concordia,31.570,-91.622,Rural clinic,1
+P3,Orleans Internal Medicine,Internal Medicine,LA,Orleans,29.951,-90.071,Urban hospital,0
+P4,Holmes Primary Care,Family Medicine,MS,Holmes,33.117,-90.034,Rural clinic,1
+P5,Sunflower Community Health,Family Medicine,MS,Sunflower,33.606,-90.530,Rural clinic,1
+P6,Hinds General Internal,Internal Medicine,MS,Hinds,32.300,-90.190,Urban hospital,0
+P7,Wilcox Rural OB Clinic,Obstetrics & Gynecology,AL,Wilcox,32.000,-87.300,Rural clinic,1
+P8,Greene Mental Health Center,Psychiatry,AL,Greene,32.840,-87.950,Rural mental health,1
+P9,Jefferson Women’s Health,Obstetrics & Gynecology,AL,Jefferson,33.520,-86.810,Urban hospital,0
+P10,Zavala Family Practice,Family Medicine,TX,Zavala,28.860,-99.760,Rural clinic,1
+P11,Presidio Behavioral Health,Psychiatry,TX,Presidio,29.560,-104.370,Rural mental health,1
+P12,Harris Academic Medical Center,Internal Medicine,TX,Harris,29.760,-95.370,Urban hospital,0
+P13,Evangeline Behavioral Health,Psychiatry,LA,Evangeline,30.700,-92.350,Rural mental health,1
+P14,Delta Women’s Health,Obstetrics & Gynecology,MS,Sunflower,33.620,-90.520,Rural clinic,1
