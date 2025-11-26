@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rural Care Accessibility Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f8;
+      color: #222;
+    }
+
+    header {
+      background: #1f4e79;
+      color: #fff;
+      padding: 1.5rem;
+    }
+
+    header h1 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.5rem;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 1.5rem auto 3rem auto;
+      padding: 0 1rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      padding: 1.25rem 1.5rem;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0.6rem 0 0.25rem;
+    }
+
+    select, input[type="number"], button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.4rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+
+    button {
+      margin-top: 0.85rem;
+      background: #1f4e79;
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #24639d;
+    }
+
+    .small {
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    .result-badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .score-good {
+      background: #1b9e77;
+    }
+    .score-moderate {
+      background: #d98f15;
+    }
+    .score-poor {
+      background: #c43d3d;
+    }
+    .score-none {
+      background: #555;
+    }
+
+    .score-value {
+      font-size: 2.0rem;
+      font-weight: 700;
+    }
+
+    .score-label {
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.75rem;
+      font-size: 0.82rem;
+    }
+
+    th, td {
+      padding: 0.3rem 0.4rem;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f1f5;
+      font-weight: 600;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #eef2ff;
+      color: #333;
+    }
+
+    footer {
+      max-width: 1100px;
+      margin: 0 auto 2rem auto;
+      padding: 0 1rem;
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    ul {
+      padding-left: 1.1rem;
+    }
+
+    li {
+      margin-bottom: 0.25rem;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Rural Care Accessibility Simulator</h1>
+    <p>
+      Explore how county, specialty, and travel-time assumptions affect access to care in a
+      small, illustrative rural-health dataset.
+    </p>
+  </header>
+
+  <main>
+    <div class="layout">
+      <!-- Left: Controls -->
+      <section class="card">
+        <h2>Simulation Inputs</h2>
+        <p class="small">
+          1. Choose a state and county.<br />
+          2. Choose a clinical specialty.<br />
+          3. Set the maximum acceptable one-way travel time (minutes).<br />
+          4. Click <strong>Run simulation</strong>.
+        </p>
+
+        <label for="stateSelect">State</label>
+        <select id="stateSelect">
+          <option value="">-- Select state --</option>
+        </select>
+
+        <label for="countySelect">County</label>
+        <select id="countySelect" disabled>
+          <option value="">-- Select county --</option>
+        </select>
+
+        <label for="specialtySelect">Specialty</label>
+        <select id="specialtySelect">
+          <option value="">-- Select specialty --</option>
+        </select>
+
+        <label for="maxTravelInput">
+          Max acceptable one-way travel time (minutes)
+        </label>
+        <input
+          type="number"
+          id="maxTravelInput"
+          min="10"
+          max="240"
+          step="5"
+          value="60"
+        />
+        <p class="small">
+          Travel time is approximated from straight-line distance assuming
+          an average driving speed of 80 km/h. This is a simplified model for
+          planning conversations, not a routing engine.
+        </p>
+
+        <button id="runButton">Run simulation</button>
+      </section>
+
+      <!-- Right: Results -->
+      <section class="card">
+        <h2>Results</h2>
+        <div id="resultsPanel">
+          <p class="small">
+            Select inputs on the left and click <strong>Run simulation</strong>.
+            Results will show here.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top: 1.5rem;">
+      <h2>Methodology (v1 Prototype)</h2>
+      <p class="small">
+        This simulator is intentionally lightweight. It uses a small, illustrative dataset
+        of counties and providers. Travel time is computed using:
+      </p>
+      <ul class="small">
+        <li>
+          Great-circle distance (haversine formula) between county centroid and provider
+          coordinates.
+        </li>
+        <li>
+          Assumed average driving speed of 80 km/h to convert distance to minutes.
+        </li>
+        <li>
+          Accessibility score = <code>max(0, 1 − min(nearest_time, 120) / 120)</code>.
+        </li>
+      </ul>
+      <p class="small">
+        The code is designed so you can swap in real NPI/provider and county datasets later,
+        while keeping the same scoring logic.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      This prototype is for educational and strategic-planning purposes only. It does not
+      represent real-time provider availability, routing, or emergency guidance.
+    </p>
+  </footer>
+
+  <script>
+    // ---- Simple CSV loader (no commas inside fields) ----
+    async function loadCsv(path) {
+      const resp = await fetch(path);
+      if (!resp.ok) {
+        throw new Error("Failed to load " + path + ": " + resp.status);
+      }
+      const text = await resp.text();
+      const lines = text.trim().split(/\r?\n/);
+      const header = lines[0].split(",");
+      const rows = lines.slice(1).map(line => {
+        const cols = line.split(",");
+        const obj = {};
+        header.forEach((h, i) => {
+          obj[h] = cols[i];
+        });
+        return obj;
+      });
+      return rows;
+    }
+
+    // ---- Haversine distance in km ----
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Earth radius km
+      const toRad = deg => (deg * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) *
+          Math.cos(toRad(lat2)) *
+          Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    // ---- Accessibility score & label ----
+    function accessibilityScore(nearestMinutes) {
+      if (nearestMinutes === null || nearestMinutes === undefined) {
+        return { score: 0, label: "No access", className: "score-none" };
+      }
+      const capped = Math.min(nearestMinutes, 120);
+      const raw = 1 - capped / 120;
+      const score = Math.max(0, raw);
+      let label, cls;
+      if (score >= 0.7) {
+        label = "Good access";
+        cls = "score-good";
+      } else if (score >= 0.4) {
+        label = "Moderate access";
+        cls = "score-moderate";
+      } else if (score > 0) {
+        label = "Poor access";
+        cls = "score-poor";
+      } else {
+        label = "No access";
+        cls = "score-none";
+      }
+      return { score, label, className: cls };
+    }
+
+    const stateSelect = document.getElementById("stateSelect");
+    const countySelect = document.getElementById("countySelect");
+    const specialtySelect = document.getElementById("specialtySelect");
+    const maxTravelInput = document.getElementById("maxTravelInput");
+    const runButton = document.getElementById("runButton");
+    const resultsPanel = document.getElementById("resultsPanel");
+
+    let counties = [];
+    let providers = [];
+
+    function populateStateAndCounty() {
+      const states = Array.from(new Set(counties.map(c => c.state))).sort();
+      stateSelect.innerHTML = '<option value="">-- Select state --</option>';
+      states.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = s;
+        stateSelect.appendChild(opt);
+      });
+
+      countySelect.innerHTML = '<option value="">-- Select county --</option>';
+      countySelect.disabled = true;
+    }
+
+    function populateSpecialties() {
+      const specs = Array.from(new Set(providers.map(p => p.specialty))).sort();
+      specialtySelect.innerHTML = '<option value="">-- Select specialty --</option>';
+      specs.forEach(sp => {
+        const opt = document.createElement("option");
+        opt.value = sp;
+        opt.textContent = sp;
+        specialtySelect.appendChild(opt);
+      });
+    }
+
+    stateSelect.addEventListener("change", () => {
+      const stateVal = stateSelect.value;
+      if (!stateVal) {
+        countySelect.innerHTML = '<option value="">-- Select county --</option>';
+        countySelect.disabled = true;
+        return;
+      }
+      const filtered = counties.filter(c => c.state === stateVal);
+      countySelect.innerHTML = '<option value="">-- Select county --</option>';
+      filtered
+        .sort((a, b) => a.county.localeCompare(b.county))
+        .forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.county;
+          opt.textContent = c.county;
+          countySelect.appendChild(opt);
+        });
+      countySelect.disabled = false;
+    });
+
+    runButton.addEventListener("click", () => {
+      const stateVal = stateSelect.value;
+      const countyVal = countySelect.value;
+      const specVal = specialtySelect.value;
+      const maxTravel = Number(maxTravelInput.value || "0");
+
+      if (!stateVal || !countyVal || !specVal || !maxTravel) {
+        resultsPanel.innerHTML =
+          '<p class="small">Please select <strong>state</strong>, <strong>county</strong>, <strong>specialty</strong>, and a valid <strong>max travel time</strong> before running the simulation.</p>';
+        return;
+      }
+
+      const county = counties.find(
+        c => c.state === stateVal && c.county === countyVal
+      );
+      if (!county) {
+        resultsPanel.innerHTML =
+          '<p class="small">Selected county not found in the dataset.</p>';
+        return;
+      }
+
+      const countyLat = Number(county.lat);
+      const countyLon = Number(county.lon);
+
+      // Filter providers for this specialty (across all states for now)
+      const relevantProviders = providers.filter(
+        p => p.specialty === specVal
+      );
+
+      if (!relevantProviders.length) {
+        resultsPanel.innerHTML =
+          '<p class="small">No providers found for this specialty in the current dataset.</p>';
+        return;
+      }
+
+      const withDistance = relevantProviders.map(p => {
+        const plat = Number(p.lat);
+        const plon = Number(p.lon);
+        const distanceKm = haversineKm(countyLat, countyLon, plat, plon);
+        const travelMinutes = (distanceKm / 80) * 60; // 80 km/h
+        return { ...p, distanceKm, travelMinutes };
+      });
+
+      withDistance.sort((a, b) => a.travelMinutes - b.travelMinutes);
+      const nearest = withDistance[0];
+      const withinMax = withDistance.filter(p => p.travelMinutes <= maxTravel);
+
+      const nearestTime = nearest ? nearest.travelMinutes : null;
+      const { score, label, className } = accessibilityScore(nearestTime);
+
+      // Build result HTML
+      let html = "";
+
+      html += '<div style="display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;">';
+      html += '<div>';
+      html += `<div class="score-value">${(score * 100).toFixed(0)}%</div>`;
+      html += `<div class="score-label">Accessibility score</div>`;
+      html += "</div>";
+      html += `<div><span class="result-badge ${className}">${label}</span></div>`;
+      html += "</div>";
+
+      html += `<p class="small" style="margin-top:0.75rem;">
+        County: <strong>${county.county}, ${county.state}</strong><br/>
+        Rurality score (1=urban, 5=most rural): <strong>${county.rurality_score}</strong><br/>
+        Selected specialty: <strong>${specVal}</strong><br/>
+        Max acceptable one-way travel time: <strong>${maxTravel} minutes</strong>
+      </p>`;
+
+      if (nearest) {
+        html += `<p class="small">
+          Nearest provider in this dataset is
+          <strong>${nearest.name}</strong> (${nearest.setting}, ${nearest.state}),
+          approximately <strong>${nearest.distanceKm.toFixed(1)} km</strong> away
+          (~<strong>${nearest.travelMinutes.toFixed(0)} minutes</strong> one-way at 80 km/h).
+        </p>`;
+      } else {
+        html += `<p class="small">
+          No providers found for this specialty in the dataset.
+        </p>`;
+      }
+
+      if (withinMax.length) {
+        html += `<p class="small">
+          Providers within your max one-way travel time (${maxTravel} minutes): <strong>${withinMax.length}</strong>.
+        </p>`;
+        html += "<table>";
+        html += "<thead><tr>";
+        html += "<th>Name</th><th>State</th><th>County</th><th>Setting</th><th>Distance (km)</th><th>Travel (min)</th>";
+        html += "</tr></thead><tbody>";
+
+        withinMax.slice(0, 25).forEach(p => {
+          html += "<tr>";
+          html += `<td>${p.name}</td>`;
+          html += `<td>${p.state}</td>`;
+          html += `<td>${p.county}</td>`;
+          html += `<td><span class="pill">${p.setting}</span></td>`;
+          html += `<td>${p.distanceKm.toFixed(1)}</td>`;
+          html += `<td>${p.travelMinutes.toFixed(0)}</td>`;
+          html += "</tr>";
+        });
+
+        html += "</tbody></table>";
+      } else {
+        html += `<p class="small">
+          <strong>No providers</strong> for this specialty fall within your max travel time constraint
+          in this sample dataset. This would be a <strong>critical access gap</strong> in a real-world analysis.
+        </p>`;
+      }
+
+      resultsPanel.innerHTML = html;
+    });
+
+    async function init() {
+      try {
+        counties = await loadCsv("data/counties.csv");
+        providers = await loadCsv("data/providers.csv");
+        populateStateAndCounty();
+        populateSpecialties();
+      } catch (err) {
+        console.error(err);
+        resultsPanel.innerHTML =
+          '<p class="small">Error loading data. Please check that <code>docs/data/counties.csv</code> and <code>docs/data/providers.csv</code> exist in the repository.</p>';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
