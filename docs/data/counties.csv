@@ -1,0 +1,13 @@
+state,county,lat,lon,rurality_score
+LA,Evangeline,30.716,-92.410,4
+LA,Concordia,31.570,-91.620,4
+LA,Orleans,29.951,-90.071,1
+MS,Holmes,33.117,-90.034,5
+MS,Sunflower,33.606,-90.530,4
+MS,Hinds,32.300,-90.190,2
+AL,Wilcox,32.000,-87.300,5
+AL,Greene,32.840,-87.950,4
+AL,Jefferson,33.520,-86.810,1
+TX,Zavala,28.860,-99.760,4
+TX,Presidio,29.560,-104.370,5
+TX,Harris,29.760,-95.370,1
